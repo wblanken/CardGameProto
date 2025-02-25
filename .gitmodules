@@ -1,0 +1,3 @@
+[submodule "Plugins/APILoader"]
+	path = Plugins/APILoader
+	url = https://github.com/wblanken/APILoader
