@@ -12,7 +12,15 @@ class UApiSettings;
 DECLARE_DELEGATE_OneParam(FSOnPacksLoadedEvent, const TArray<FPackData>&);
 
 /**
- * 
+ * @class SApiSettingsWidget
+ * @brief Represents a settings widget for configuring API-related settings and preferences.
+ *
+ * This class encapsulates the GUI components and logic for handling the
+ * presentation and interaction with API settings. It is designed to simplify
+ * the configuration process and provides intuitive controls for the user.
+ *
+ * The widget may include fields for specifying API endpoints, authentication
+ * details, and other relevant parameters needed for API integration.
  */
 class SApiSettingsWidget : public SCompoundWidget
 {

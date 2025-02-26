@@ -13,7 +13,16 @@ class UApiSettingsWidgetStyle;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPacksLoadedEvent, const TArray<FPackData>&, PackDataArray);
 
 /**
- * 
+ * @class UApiSettingsWidget
+ * @brief A widget class used for managing and displaying API settings.
+ *
+ * UApiSettingsWidget provides functionality to configure and manage
+ * settings required for API interaction. The widget is designed to run
+ * within the Unreal Engine editor and offers a customizable appearance
+ * and style.
+ *
+ * It facilitates the use of dynamic events for notifying other classes
+ * when API-related data are loaded.
  */
 UCLASS()
 class CARDDATALOADER_API UApiSettingsWidget : public UEditorUtilityWidget

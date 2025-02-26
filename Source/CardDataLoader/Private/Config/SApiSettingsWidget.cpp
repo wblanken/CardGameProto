@@ -15,6 +15,14 @@
 
 BEGIN_SLATE_FUNCTION_BUILD_OPTIMIZATION
 
+/**
+ * Constructs and initializes the SApiSettingsWidget instance with the provided arguments.
+ * Sets up UI components such as text labels, editable text boxes, and buttons in a grid layout,
+ * binding the widgets to interact with the ApiSettings object.
+ *
+ * @param InArgs The arguments structure that contains initialization parameters like ApiSettings, LabelStyle,
+ *               InputStyle, ColPadding, and event delegates such as OnPacksLoaded.
+ */
 void SApiSettingsWidget::Construct(const FArguments& InArgs)
 {
 	ApiSettings = InArgs._ApiSettings;
@@ -136,6 +144,13 @@ void SApiSettingsWidget::Construct(const FArguments& InArgs)
 	];
 }
 
+/**
+ * Handles the click event for the "Update Packs" button.
+ * Disables the button, shows a loading indicator, builds the URL for the API request,
+ * sends a GET request to load packs, and logs the API request details.
+ *
+ * @return FReply::Handled to indicate the event has been handled.
+ */
 FReply SApiSettingsWidget::OnUpdatePacksClick()
 {
 	UpdatePacksBtn->SetEnabled(false);
@@ -158,6 +173,12 @@ FReply SApiSettingsWidget::OnUpdatePacksClick()
 	return FReply::Handled();	
 }
 
+/**
+ * Validates the API settings by checking if the ApiSettings object is valid.
+ * Logs an error if the ApiSettings object is null.
+ *
+ * @return True if the ApiSettings object is valid; false otherwise.
+ */
 bool SApiSettingsWidget::CheckApiSettingsValid() const
 {
 	if(!ApiSettings.IsValid())
@@ -168,8 +189,16 @@ bool SApiSettingsWidget::CheckApiSettingsValid() const
 	return true;
 }
 
+/**
+ * Handles the response from the HTTP request to retrieve pack data from the API.
+ * Updates the UI based on the success or failure of the request and processes the response data if successful.
+ *
+ * @param request The HTTP request sent to the API.
+ * @param response The HTTP response received from the API.
+ * @param bWasSuccessful A boolean indicating whether the HTTP request was successful.
+ */
 void SApiSettingsWidget::OnPacksResponseReceived(FHttpRequestPtr request, FHttpResponsePtr response,
-	bool bWasSuccessful) 
+                                                 bool bWasSuccessful) 
 {
 	UpdatePacksBtn->SetEnabled(true);
 	LoadingIndicator->SetEnabled(false);

@@ -22,6 +22,10 @@ void UCardImporterWidget::NativeConstruct()
 	Super::NativeConstruct();
 }
 
+/**
+ * Initialize the UCardImporterWidget, setting up UI elements, loading data tables, and binding event handlers.
+ * @return true if the initialization is successful, false otherwise.
+ */
 bool UCardImporterWidget::Initialize()
 {
 	if (!Super::Initialize()) return false;
@@ -95,6 +99,11 @@ bool UCardImporterWidget::Initialize()
 	return true;
 }
 
+/**
+ * Handles the OnClick event for the Load Pack button.
+ * Verifies the existence of the PackSelector and PackDataTable objects, sets the widget to a busy state,
+ * retrieves the selected pack code, and fetches card data for the selected pack.
+ */
 void UCardImporterWidget::OnLoadPackBtnClicked()
 {
 	verify(PackSelector);
@@ -105,6 +114,11 @@ void UCardImporterWidget::OnLoadPackBtnClicked()
 	GetPackCardData(selectedPackCode);
 }
 
+/**
+ * Handles the "Build Data Assets" button click event. Validates the Pack and Set selectors,
+ * switches the widget to a busy state, retrieves the selected pack and set codes,
+ * and initiates the process of building data assets from tables.
+ */
 void UCardImporterWidget::OnBuildDataAssetBtnClicked()
 {
 	verify(PackBuildSelector);
@@ -116,6 +130,11 @@ void UCardImporterWidget::OnBuildDataAssetBtnClicked()
 	BuildDataAssetsFromTables(selectedPackCode, selectedSetCode);
 }
 
+/**
+ * Handles the event when pack data is loaded. Updates or creates a data table asset
+ * with the provided pack information and refreshes the pack selector UI.
+ * @param PackDataArray Array of pack data containing the pack details to be processed and added to the data table.
+ */
 void UCardImporterWidget::HandleOnPacksLoaded(const TArray<FPackData>& PackDataArray)
 {
 	// The asset isn't assigned, lets create it
@@ -216,6 +235,12 @@ void UCardImporterWidget::GetPackCardData(const FName& packCode)
 	request->ProcessRequest();
 }
 
+/**
+ * Builds data assets from the specified pack and set codes by verifying the necessary data tables,
+ * retrieving or creating the corresponding assets, and processing asset metadata.
+ * @param packCode The identifier for the pack to be processed.
+ * @param setCode The identifier for the set to be processed, or 'all' to process all sets in the given pack.
+ */
 void UCardImporterWidget::BuildDataAssetsFromTables(const FName& packCode, const FName& setCode)
 {
 	if (!ensureAlwaysMsgf(PackDataTable, TEXT("PackDataTable is null! Make sure you've loaded the pack data before processing!")))
@@ -285,6 +310,13 @@ void UCardImporterWidget::BuildDataAssetsFromTables(const FName& packCode, const
 	}
 }
 
+/**
+ * Toggles the busy state of the UCardImporterWidget UI to indicate an ongoing process.
+ * Disables or enables interactive elements and updates the visibility of the loading indicator.
+ *
+ * @param isBusy Set to true to indicate a busy state (disables interactive elements and shows the loading indicator),
+ *               or false for an idle state (enables interactive elements and hides the loading indicator).
+ */
 void UCardImporterWidget::SetBusy(bool isBusy)
 {
 	PackSelector->SetIsEnabled(!isBusy);
@@ -296,6 +328,16 @@ void UCardImporterWidget::SetBusy(bool isBusy)
 	LoadingIndicator->SetVisibility(isBusy ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
 }
 
+/**
+ * Handles the HTTP response received after attempting to load a pack's card data.
+ * Deserializes the response into JSON format and processes the card data if the operation is successful.
+ * If unsuccessful, logs an error and exits the function.
+ *
+ * @param packCode The unique identifier for the card pack being loaded.
+ * @param request The HTTP request object used to fetch the card pack data.
+ * @param response The HTTP response object containing the card pack data or error details.
+ * @param wasSuccessful A boolean flag indicating whether the request was successful.
+ */
 void UCardImporterWidget::OnPackCardLoadResponseReceived(const FName& packCode, const FHttpRequestPtr& request, const FHttpResponsePtr& response, bool wasSuccessful)
 {
 	if (!wasSuccessful)
@@ -318,6 +360,11 @@ void UCardImporterWidget::OnPackCardLoadResponseReceived(const FName& packCode, 
 	}
 }
 
+/**
+ * Populates the given combo box with pack options from the PackDataTable and stores mapping of pack names to their codes.
+ * @param comboBox A pointer to the combo box that will be populated with pack options.
+ * @return true if the combo box was successfully populated, false if the combo box pointer is null or an error occurred.
+ */
 bool UCardImporterWidget::PopulatePackCombobox(UEditorUtilityComboBoxString* comboBox)
 {
 	if (comboBox)
@@ -341,6 +388,13 @@ bool UCardImporterWidget::PopulatePackCombobox(UEditorUtilityComboBoxString* com
 	return false;
 }
 
+/**
+ * Populates the data table pack selector widget, enabling or disabling related UI elements
+ * based on the state of the PackDataTable.
+ * If PackDataTable is valid, it populates the PackSelector and PackBuildSelector comboboxes, enabling them
+ * and the LoadPack button. If PackDataTable is null, the comboboxes and the button are disabled,
+ * and their options are cleared.
+ */
 void UCardImporterWidget::PopulateDTPackSelector()
 {
 	if (PackDataTable != nullptr)
@@ -560,6 +614,12 @@ void UCardImporterWidget::ProcessPackData(const FName& packCode, const TArray<TS
 	SetBusy(false);
 }
 
+/**
+ * Builds a base card object from a JSON-defined card data structure and associates it with a specific pack code.
+ * @param cardData JSON object containing the card data, including attributes like name, type, traits, etc.
+ * @param packCode Identifier for the card's associated pack.
+ * @return An optional FBaseCardData. If the card data is invalid (e.g., contains invalid faction or type information), returns NullOpt.
+ */
 TOptional<FBaseCardData> UCardImporterWidget::BuildBaseCard(const FJsonObject& cardData, const FName& packCode)
 {
 	FBaseCardData card;
@@ -662,7 +722,19 @@ TOptional<FBaseCardData> UCardImporterWidget::BuildBaseCard(const FJsonObject& c
 	return card;
 }
 
-FHeroCardData UCardImporterWidget::BuildHeroCard(FBaseCardData& baseCard, const FJsonObject& cardData)
+/**
+ * Constructs a hero card instance by populating the FHeroCardData structure with data
+ * from a given base card and JSON object.
+ *
+ * The function initializes a hero card based on the provided base card data and updates
+ * its properties by extracting values from the JSON object. These include various gameplay
+ * attributes such as cost, hand size, defense, etc. Additionally, it handles complex relationships,
+ * like linked cards or duplicate lists, and assigns related resource costs.
+ *
+ * @param baseCard The base card data from which the hero card is derived.
+ * @param cardData A JSON object containing the additional data fields for the hero card.
+ * @return A fully constructed FHeroCardData instance populated with the provided data.
+ */
 {
 	auto heroCard = FHeroCardData(baseCard);
 
@@ -729,7 +801,15 @@ FHeroCardData UCardImporterWidget::BuildHeroCard(FBaseCardData& baseCard, const 
 	return heroCard;
 }
 
-TOptional<FHeroCardData> UCardImporterWidget::BuildLinkedHeroCard(FJsonObject& cardData, const FName& packCode)
+/**
+ * Build a linked hero card by extracting and processing the "linked_card" field from the given JSON object.
+ * It constructs a base card from the linked card's data and then transforms it into a hero card using the main card data.
+ * Logs an error and returns NullOpt if the "linked_card" field is missing or if the base card could not be built.
+ *
+ * @param cardData The JSON object containing card data, potentially including a "linked_card" field with its data.
+ * @param packCode The code identifying the card pack to which the card belongs.
+ * @return An optional FHeroCardData object representing the linked hero card if successfully constructed, or NullOpt otherwise.
+ */
 {
 	if (const TSharedPtr<FJsonObject>* linkedCard; cardData.TryGetObjectField("linked_card", linkedCard))
 	{
@@ -744,6 +824,13 @@ TOptional<FHeroCardData> UCardImporterWidget::BuildLinkedHeroCard(FJsonObject& c
 	return NullOpt;
 }
 
+/**
+ * Builds an encounter card by populating an FEncounterCardData structure with data from a base card and JSON object.
+ *
+ * @param baseCard The base card data to initialize the encounter card with.
+ * @param cardData The JSON object containing additional properties for populating the encounter card.
+ * @return A fully populated FEncounterCardData instance with data from the provided base card and JSON object.
+ */
 FEncounterCardData UCardImporterWidget::BuildEncounterCard(const FBaseCardData& baseCard, const FJsonObject& cardData)
 {
 	auto encounterCard = FEncounterCardData(baseCard);
