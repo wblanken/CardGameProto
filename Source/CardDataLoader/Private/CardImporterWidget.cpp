@@ -492,7 +492,7 @@ void UCardImporterWidget::ProcessPackData(const FName& packCode, const TArray<TS
 			{
 				set = FCardSet();
 				set->CardSetCode = card->CardSetCode;
-				if (!cardObj.TryGetStringField("card_set_name", set->CardSetName))
+				if (!cardObj.TryGetStringField(TEXT("card_set_name"), set->CardSetName))
 				{
 					set->CardSetName = card->CardSetCode.ToString();
 					set->CardSetName[0] = toupper(set->CardSetName[0]);
@@ -503,7 +503,7 @@ void UCardImporterWidget::ProcessPackData(const FName& packCode, const TArray<TS
 			// Aspect and basic cards already have this data set during earlier processing.
 			if (card->CardSetType == ECardSetType::None)
 			{
-				const auto setTypeString = cardObj.GetStringField("card_set_type_name_code");
+				const auto setTypeString = cardObj.GetStringField(TEXT("card_set_type_name_code"));
 				auto setTypeEnum = StaticEnum<ECardSetType>()->GetValueByNameString(setTypeString);
 
 				if (setTypeEnum == -1)
@@ -513,7 +513,7 @@ void UCardImporterWidget::ProcessPackData(const FName& packCode, const TArray<TS
 					continue;
 				}
 				card->CardSetType = static_cast<ECardSetType>(setTypeEnum);
-				cardObj.TryGetNumberField("set_position", card->SetPosition);
+				cardObj.TryGetNumberField(TEXT("set_position"), card->SetPosition);
 			}
 		}
 
@@ -623,40 +623,41 @@ void UCardImporterWidget::ProcessPackData(const FName& packCode, const TArray<TS
 TOptional<FBaseCardData> UCardImporterWidget::BuildBaseCard(const FJsonObject& cardData, const FName& packCode)
 {
 	FBaseCardData card;
-	card.Name = cardData.GetStringField("name");
-	card.Code = FName(cardData.GetStringField("code"));
+	card.Name = cardData.GetStringField(TEXT("name"));
+	card.Code = FName(cardData.GetStringField(TEXT("code")));
 
 	UE_LOG(LogCardDataLoader, Display, TEXT("Processing Card: %s - %s"), *card.Name, *card.Code.ToString());
 
-	cardData.TryGetNumberField("quantity", card.Quantity);
+	cardData.TryGetNumberField(TEXT("quantity"), card.Quantity);
 	card.PackCode = packCode;
-	cardData.TryGetNumberField("position", card.Position);
-	cardData.TryGetNumberField("quantity", card.Quantity);
-	cardData.TryGetNumberField("deck_limit", card.DeckLimit);
-	cardData.TryGetNumberField("health", card.Health);
-	card.HealthPerHero = cardData.GetBoolField("health_per_hero");
-	cardData.TryGetNumberField("scheme", card.Scheme);
-	cardData.TryGetNumberField("attack", card.Attack);
-	cardData.TryGetNumberField("attack_cost", card.AttackCost);
-	cardData.TryGetStringField("attack_text", card.AttackText);
-	cardData.TryGetStringField("traits", card.Traits);
-	cardData.TryGetStringField("real_traits", card.RealTraits);
-	cardData.TryGetStringField("flavor", card.FlavorText);
-	card.IsUnique = cardData.GetBoolField("is_unique");
-	card.Hidden = cardData.GetBoolField("hidden");
-	card.Permanent = cardData.GetBoolField("permanent");
-	card.DoubleSided = cardData.GetBoolField("double_sided");
+	cardData.TryGetNumberField(TEXT("position"), card.Position);
+	cardData.TryGetNumberField(TEXT("quantity"), card.Quantity);
+	cardData.TryGetNumberField(TEXT("deck_limit"), card.DeckLimit);
+	cardData.TryGetNumberField(TEXT("health"), card.Health);
+	card.HealthPerHero = cardData.GetBoolField(TEXT("health_per_hero"));
+	cardData.TryGetNumberField(TEXT("scheme"), card.Scheme);
+	cardData.TryGetNumberField(TEXT("attack"), card.Attack);
+	cardData.TryGetNumberField(TEXT("attack_cost"), card.AttackCost);
+	cardData.TryGetStringField(TEXT("attack_text"), card.AttackText);
+	cardData.TryGetStringField(TEXT("traits"), card.Traits);
+	cardData.TryGetStringField(TEXT("real_traits"), card.RealTraits);
+	cardData.TryGetStringField(TEXT("flavor"), card.FlavorText);
+	card.IsUnique = cardData.GetBoolField(TEXT("is_unique"));
+	card.Hidden = cardData.GetBoolField(TEXT("hidden"));
+	card.Permanent = cardData.GetBoolField(TEXT("permanent"));
+	card.DoubleSided = cardData.GetBoolField(TEXT("double_sided"));
 
 	FString cardImageSrc;
-	if (cardData.TryGetStringField("imagesrc", cardImageSrc))
+	if (cardData.TryGetStringField(TEXT("imagesrc"), cardImageSrc))
 	{
 		card.ImageSrc = FName(cardImageSrc);
 	}
 
-	cardData.TryGetStringField("text", card.Text);
-	cardData.TryGetStringField("real_text", card.RealText);
+	// TODO Parse out the text into a format we can use with our rich text box.
+	cardData.TryGetStringField(TEXT("text"), card.Text);
+	cardData.TryGetStringField(TEXT("real_text"), card.RealText);
 
-	const auto cardFaction = StaticEnum<EFaction>()->GetValueByNameString(cardData.GetStringField("faction_name"));
+	const auto cardFaction = StaticEnum<EFaction>()->GetValueByNameString(cardData.GetStringField(TEXT("faction_name")));
 	if (cardFaction == -1)
 	{
 		UE_LOG(LogCardDataLoader, Error, TEXT("Invalid card faction, can't process card %s further, skipping!"), *card.Name);
@@ -666,7 +667,7 @@ TOptional<FBaseCardData> UCardImporterWidget::BuildBaseCard(const FJsonObject& c
 	card.Faction = static_cast<EFaction>(cardFaction);
 
 	FString cardSetCode;
-	if (cardData.TryGetStringField("card_set_code", cardSetCode))
+	if (cardData.TryGetStringField(TEXT("card_set_code"), cardSetCode))
 	{
 		// Merge nemesis sets into hero sets
 		cardSetCode.RemoveFromEnd("_nemesis");
@@ -707,7 +708,7 @@ TOptional<FBaseCardData> UCardImporterWidget::BuildBaseCard(const FJsonObject& c
 		}
 	}
 
-	auto typeString = cardData.GetStringField("type_name");
+	auto typeString = cardData.GetStringField(TEXT("type_name"));
 	typeString.ReplaceCharInline('-', ' ');
 	typeString.RemoveSpacesInline();
 	const auto cardType = StaticEnum<ECardType>()->GetValueByNameString(typeString);
@@ -735,28 +736,29 @@ TOptional<FBaseCardData> UCardImporterWidget::BuildBaseCard(const FJsonObject& c
  * @param cardData A JSON object containing the additional data fields for the hero card.
  * @return A fully constructed FHeroCardData instance populated with the provided data.
  */
+FHeroCardData UCardImporterWidget::BuildHeroCard(const FBaseCardData& baseCard, const FJsonObject& cardData)
 {
 	auto heroCard = FHeroCardData(baseCard);
 
 	FString linkedToCode;
-	if (cardData.TryGetStringField("linked_to_code", linkedToCode))
+	if (cardData.TryGetStringField(TEXT("linked_to_code"), linkedToCode))
 	{
 		heroCard.LinkedToCode = FName(linkedToCode);
-		heroCard.DoubleSided = true; // For some reason linked cards don't count as double sided in the API.
+		heroCard.DoubleSided = true; // For some reason linked cards don't count as double-sided in the API.
 	}
 
-	cardData.TryGetNumberField("hand_size", heroCard.HandSize);
-	cardData.TryGetNumberField("cost", heroCard.Cost);
-	cardData.TryGetStringField("subname", heroCard.SubName);
-	cardData.TryGetNumberField("defense", heroCard.Defense);
-	cardData.TryGetNumberField("defense_cost", heroCard.DefenseCost);
-	cardData.TryGetNumberField("recover", heroCard.Recover);
-	cardData.TryGetNumberField("recover_cost", heroCard.RecoverCost);
-	cardData.TryGetNumberField("thwart", heroCard.Thwart);
-	cardData.TryGetNumberField("thwart_cost", heroCard.ThwartCost);
+	cardData.TryGetNumberField(TEXT("hand_size"), heroCard.HandSize);
+	cardData.TryGetNumberField(TEXT("cost"), heroCard.Cost);
+	cardData.TryGetStringField(TEXT("subname"), heroCard.SubName);
+	cardData.TryGetNumberField(TEXT("defense"), heroCard.Defense);
+	cardData.TryGetNumberField(TEXT("defense_cost"), heroCard.DefenseCost);
+	cardData.TryGetNumberField(TEXT("recover"), heroCard.Recover);
+	cardData.TryGetNumberField(TEXT("recover_cost"), heroCard.RecoverCost);
+	cardData.TryGetNumberField(TEXT("thwart"), heroCard.Thwart);
+	cardData.TryGetNumberField(TEXT("thwart_cost"), heroCard.ThwartCost);
 
 	const TArray<TSharedPtr<FJsonValue>>* dupeList;
-	if (cardData.TryGetArrayField("duplicated_by", dupeList))
+	if (cardData.TryGetArrayField(TEXT("duplicated_by"), dupeList))
 	{
 		for (const auto& dupe : *dupeList)
 		{
@@ -766,7 +768,7 @@ TOptional<FBaseCardData> UCardImporterWidget::BuildBaseCard(const FJsonObject& c
 	}
 
 	int energy;
-	if (cardData.TryGetNumberField("resource_energy", energy))
+	if (cardData.TryGetNumberField(TEXT("resource_energy"), energy))
 	{
 		auto energyCost = FResourceCost();
 		energyCost.Resource = EResource::Energy;
@@ -774,7 +776,7 @@ TOptional<FBaseCardData> UCardImporterWidget::BuildBaseCard(const FJsonObject& c
 		heroCard.ResourceCosts.Emplace(energyCost);
 	}
 	int physical;
-	if (cardData.TryGetNumberField("resource_physical", physical))
+	if (cardData.TryGetNumberField(TEXT("resource_physical"), physical))
 	{
 		auto physicalCost = FResourceCost();
 		physicalCost.Resource = EResource::Physical;
@@ -782,7 +784,7 @@ TOptional<FBaseCardData> UCardImporterWidget::BuildBaseCard(const FJsonObject& c
 		heroCard.ResourceCosts.Emplace(physicalCost);
 	}
 	int mental;
-	if (cardData.TryGetNumberField("resource_mental", mental))
+	if (cardData.TryGetNumberField(TEXT("resource_mental"), mental))
 	{
 		auto mentalCost = FResourceCost();
 		mentalCost.Resource = EResource::Mental;
@@ -790,7 +792,7 @@ TOptional<FBaseCardData> UCardImporterWidget::BuildBaseCard(const FJsonObject& c
 		heroCard.ResourceCosts.Emplace(mentalCost);
 	}
 	int wild;
-	if (cardData.TryGetNumberField("resource_wild", wild))
+	if (cardData.TryGetNumberField(TEXT("resource_wild"), wild))
 	{
 		auto wildCost = FResourceCost();
 		wildCost.Resource = EResource::Wild;
@@ -810,8 +812,9 @@ TOptional<FBaseCardData> UCardImporterWidget::BuildBaseCard(const FJsonObject& c
  * @param packCode The code identifying the card pack to which the card belongs.
  * @return An optional FHeroCardData object representing the linked hero card if successfully constructed, or NullOpt otherwise.
  */
+TOptional<FHeroCardData> UCardImporterWidget::BuildLinkedHeroCard(const FJsonObject& cardData, const FName& packCode)
 {
-	if (const TSharedPtr<FJsonObject>* linkedCard; cardData.TryGetObjectField("linked_card", linkedCard))
+	if (const TSharedPtr<FJsonObject>* linkedCard; cardData.TryGetObjectField(TEXT("linked_card"), linkedCard))
 	{
 		auto baseCard = BuildBaseCard(*linkedCard->Get(), packCode);
 		if (baseCard.IsSet())
@@ -835,24 +838,24 @@ FEncounterCardData UCardImporterWidget::BuildEncounterCard(const FBaseCardData& 
 {
 	auto encounterCard = FEncounterCardData(baseCard);
 
-	cardData.TryGetNumberField("stage", encounterCard.Stage);
-	cardData.TryGetNumberField("stage", encounterCard.BaseThreat);
-	cardData.TryGetBoolField("base_threat_fixed", encounterCard.BaseThreatFixed);
-	cardData.TryGetNumberField("escalation_threat", encounterCard.EscalationThreat);
-	cardData.TryGetBoolField("escalation_threat_fixed", encounterCard.EscalationThreatFixed);
-	cardData.TryGetNumberField("threat", encounterCard.Threat);
-	cardData.TryGetBoolField("threat_fixed", encounterCard.ThreatFixed);
-	cardData.TryGetNumberField("scheme_crisis", encounterCard.SchemeCrisis);
-	cardData.TryGetNumberField("scheme_hazard", encounterCard.SchemeHazard);
-	cardData.TryGetStringField("back_text", encounterCard.BackText);
-	cardData.TryGetStringField("back_flavor", encounterCard.BackFlavor);
+	cardData.TryGetNumberField(TEXT("stage"), encounterCard.Stage);
+	cardData.TryGetNumberField(TEXT("stage"), encounterCard.BaseThreat);
+	cardData.TryGetBoolField(TEXT("base_threat_fixed"), encounterCard.BaseThreatFixed);
+	cardData.TryGetNumberField(TEXT("escalation_threat"), encounterCard.EscalationThreat);
+	cardData.TryGetBoolField(TEXT("escalation_threat_fixed"), encounterCard.EscalationThreatFixed);
+	cardData.TryGetNumberField(TEXT("threat"), encounterCard.Threat);
+	cardData.TryGetBoolField(TEXT("threat_fixed"), encounterCard.ThreatFixed);
+	cardData.TryGetNumberField(TEXT("scheme_crisis"), encounterCard.SchemeCrisis);
+	cardData.TryGetNumberField(TEXT("scheme_hazard"), encounterCard.SchemeHazard);
+	cardData.TryGetStringField(TEXT("back_text"), encounterCard.BackText);
+	cardData.TryGetStringField(TEXT("back_flavor"), encounterCard.BackFlavor);
 	FString cardBackImage;
-	if (cardData.TryGetStringField("back_flavor", cardBackImage))
+	if (cardData.TryGetStringField(TEXT("back_flavor"), cardBackImage))
 	{
 		encounterCard.BackImageSrc = FName(cardBackImage);
 	};
-	cardData.TryGetNumberField("boost", encounterCard.Boost);
-	cardData.TryGetStringField("boost_text", encounterCard.BoostText);
+	cardData.TryGetNumberField(TEXT("boost"), encounterCard.Boost);
+	cardData.TryGetStringField(TEXT("boost_text"), encounterCard.BoostText);
 
 	return encounterCard;
 }

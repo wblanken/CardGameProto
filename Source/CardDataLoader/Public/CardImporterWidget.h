@@ -72,8 +72,8 @@ private:
 	void OnPackBuildSelectorChanged(FString SelectedItem, ESelectInfo::Type SelectionType);
 
 	TOptional<FBaseCardData> BuildBaseCard(const FJsonObject& cardData, const FName& packCode);
-	FHeroCardData BuildHeroCard(FBaseCardData& baseCard, const FJsonObject& cardData);
-	TOptional<FHeroCardData> BuildLinkedHeroCard(FJsonObject& cardData, const FName& packCode);
+	FHeroCardData BuildHeroCard(const FBaseCardData& baseCard, const FJsonObject& cardData);
+	TOptional<FHeroCardData> BuildLinkedHeroCard(const FJsonObject& cardData, const FName& packCode);
 	FEncounterCardData BuildEncounterCard(const FBaseCardData& baseCard, const FJsonObject& cardData);
 	void ProcessPackData(const FName& packCode, const TArray<TSharedPtr<FJsonValue>>& CardData);
 	UDataTable* CreateDataTable(const FString& tableName, const UScriptStruct& rowType) const;
