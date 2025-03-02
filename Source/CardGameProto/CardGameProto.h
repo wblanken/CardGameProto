@@ -4,3 +4,5 @@
 
 #include "CoreMinimal.h"
 
+template <class T>
+using TStaticFuncPointer = typename TBaseStaticDelegateInstance<T, FDefaultDelegateUserPolicy>::FFuncPtr;

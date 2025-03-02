@@ -10,7 +10,7 @@ public class CardGameProto : ModuleRules
 	
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "GameplayAbilities", "CardData", "UMG" });
 
-		PrivateDependencyModuleNames.AddRange(new string[] { "CardDataLoader" });
+		PrivateDependencyModuleNames.AddRange(new string[] { "CardDataLoader", "GameplayTags", "GameplayTasks" });
 
 		// Uncomment if you are using Slate UI
 		PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });

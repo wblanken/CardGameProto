@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "CardActorBase.h"
+#include "Actor/CardActorBase.h"
 
 #include "CardDataTable.h"
 #include "Card/Widget/CardDescriptionWidget.h"
