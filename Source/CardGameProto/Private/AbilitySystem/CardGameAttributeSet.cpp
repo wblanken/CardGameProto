@@ -64,28 +64,9 @@ void UCardGameAttributeSet::SetEffectProperties(const struct FGameplayEffectModC
 
 	Props.Source.AbilitySystemComponent = Props.EffectContextHandle.GetOriginalInstigatorAbilitySystemComponent();
 
-	if (Props.Source.AbilitySystemComponent.IsValid() && Props.Source.AbilitySystemComponent->AbilityActorInfo.IsValid() && Props.Source.AbilitySystemComponent->AbilityActorInfo->AvatarActor.IsValid())
-	{
-		Props.Source.AvatarActor = Props.Source.AbilitySystemComponent->AbilityActorInfo->AvatarActor.Get();
-		Props.Source.Controller = Props.Source.AbilitySystemComponent->AbilityActorInfo->PlayerController.Get();
-		if(Props.Source.Controller == nullptr && Props.Source.AvatarActor != nullptr)
-		{
-			if (const auto pawn = Cast<APawn>(Props.Source.Controller->GetPawn()))
-			{
-				Props.Source.Controller = pawn->GetController();
-			}
-		}
-
-		if (Props.Source.Controller != nullptr)
-		{
-			Props.Source.Pawn = Cast<APawn>(Props.Source.Controller->GetPawn());
-		}
-	}
-
 	if (Data.Target.AbilityActorInfo.IsValid() && Data.Target.AbilityActorInfo->AvatarActor.IsValid())
 	{
 		Props.Target.AvatarActor = Data.Target.AbilityActorInfo->AvatarActor.Get();
-		Props.Target.Controller = Data.Target.AbilityActorInfo->PlayerController.Get();
 		Props.Target.Pawn = Cast<APawn>(Props.Target.AvatarActor);
 		Props.Target.AbilitySystemComponent = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Props.Target.AvatarActor.Get());
 	}

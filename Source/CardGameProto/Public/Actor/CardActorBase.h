@@ -20,6 +20,8 @@ class CARDGAMEPROTO_API ACardActorBase : public AActor, public IAbilitySystemInt
 public:	
 	// Sets default values for this actor's properties
 	ACardActorBase();
+
+	UFUNCTION(BlueprintCallable)
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	
 protected:

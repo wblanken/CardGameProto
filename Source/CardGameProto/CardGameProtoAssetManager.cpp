@@ -10,8 +10,8 @@ UCardGameProtoAssetManager& UCardGameProtoAssetManager::Get()
 {
 	check(GEngine);
 	
-	auto auraAssetManager = Cast<UCardGameProtoAssetManager>(GEngine->AssetManager);
-	return *auraAssetManager;
+	auto cardGameProtoAssetManager = Cast<UCardGameProtoAssetManager>(GEngine->AssetManager);
+	return *cardGameProtoAssetManager;
 }
 
 void UCardGameProtoAssetManager::StartInitialLoading()

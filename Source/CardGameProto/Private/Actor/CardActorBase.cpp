@@ -3,9 +3,6 @@
 
 #include "Actor/CardActorBase.h"
 
-#include "CardDataTable.h"
-#include "Card/Widget/CardDescriptionWidget.h"
-#include "Card/Widget/CardNameWidget.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Engine/StaticMesh.h"
 
@@ -48,19 +45,6 @@ void ACardActorBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	checkf(!CardData.IsNull(), TEXT("AlterEgoData is null"));
-
-	auto cardData = CardData.GetRow<FBaseCardData>("");
-
-	check(cardData);
-	
-	auto nameWidget = Cast<UCardNameWidget>(NameWidget->GetWidget());		
-	nameWidget->SetCardName(*cardData->Name);
-	nameWidget->SetIsUnique(cardData->IsUnique);
-
-	auto descriptionWidget = Cast<UCardDescriptionWidget>(DescriptionWidget->GetWidget());		
-	descriptionWidget->SetTraits(*cardData->Traits);
-	descriptionWidget->SetDescription(*cardData->Text);
-	descriptionWidget->SetFlavor(*cardData->FlavorText);
+	checkf(!CardData.IsNull(), TEXT("Card Data is null"));
 }
 

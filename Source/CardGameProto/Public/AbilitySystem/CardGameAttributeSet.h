@@ -15,12 +15,6 @@
 	GAMEPLAYATTRIBUTE_VALUE_SETTER(PropertyName) \
 	GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName)
 
-#define DECLARE_ATTRIBUTE(ClassName, PropertyName) \
-	UFUNCTION() \
-	void OnRep_##PropertyName(const FGameplayAttributeData& old##PropertyName) const; \
-	FGameplayAttributeData PropertyName; \
-	ATTRIBUTE_ACCESSORS(ClassName, PropertyName) \
-
 DECLARE_DELEGATE_RetVal(FGameplayAttribute, FAttributeSignature)
 
 USTRUCT()
@@ -33,9 +27,6 @@ struct FActorEffectProperties
 
 	UPROPERTY()
 	TWeakObjectPtr<AActor> AvatarActor = nullptr;
-
-	UPROPERTY()
-	TWeakObjectPtr<AController> Controller = nullptr;
 
 	UPROPERTY()
 	TWeakObjectPtr<APawn> Pawn = nullptr;	
@@ -58,10 +49,7 @@ struct FEffectProperties
 
 typedef TStaticFuncPointer<FGameplayAttribute()> FAttributeFuncPointer;
 
-/**
- * 
- */
-UCLASS(Abstract)
+UCLASS()
 class CARDGAMEPROTO_API UCardGameAttributeSet : public UAttributeSet
 {
 	GENERATED_BODY()
@@ -75,13 +63,53 @@ public:
 	TMap<FGameplayTag, FAttributeFuncPointer> TagsToAttributes;
 
 	// Shared Attributes
-	DECLARE_ATTRIBUTE(UCardGameAttributeSet, HitPoints);
-	DECLARE_ATTRIBUTE(UCardGameAttributeSet, MaxHitPoints);
-	DECLARE_ATTRIBUTE(UCardGameAttributeSet, Attack);
-	DECLARE_ATTRIBUTE(UCardGameAttributeSet, Defense);
-	DECLARE_ATTRIBUTE(UCardGameAttributeSet, Thwart);
-	DECLARE_ATTRIBUTE(UCardGameAttributeSet, Recovery);
-	DECLARE_ATTRIBUTE(UCardGameAttributeSet, Scheme);
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_HitPoints, Category = "Shared Attributes")
+	FGameplayAttributeData HitPoints; ATTRIBUTE_ACCESSORS(UCardGameAttributeSet, HitPoints)
+	
+	UFUNCTION()
+	void OnRep_HitPoints(const FGameplayAttributeData& oldHitPoints) const;
+	
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_MaxHitPoints, Category = "Shared Attributes")
+	FGameplayAttributeData MaxHitPoints;
+	ATTRIBUTE_ACCESSORS(UCardGameAttributeSet, MaxHitPoints)
+
+	UFUNCTION()
+	void OnRep_MaxHitPoints(const FGameplayAttributeData& oldMaxHitPoints) const;
+	
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Attack, Category = "Shared Attributes")
+	FGameplayAttributeData Attack;
+	ATTRIBUTE_ACCESSORS(UCardGameAttributeSet, Attack)
+	
+	UFUNCTION()
+	void OnRep_Attack(const FGameplayAttributeData& oldAttack) const;
+	
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Defense, Category = "Hero Attributes")
+	FGameplayAttributeData Defense;
+	ATTRIBUTE_ACCESSORS(UCardGameAttributeSet, Defense)
+
+	UFUNCTION()
+	void OnRep_Defense(const FGameplayAttributeData& oldDefense) const;
+	
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Thwart, Category = "Hero Attributes")
+	FGameplayAttributeData Thwart;
+	ATTRIBUTE_ACCESSORS(UCardGameAttributeSet, Thwart)
+	
+	UFUNCTION()
+	void OnRep_Thwart(const FGameplayAttributeData& oldThwart) const;
+	
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Recovery, Category = "Hero Attributes")
+	FGameplayAttributeData Recovery;
+	ATTRIBUTE_ACCESSORS(UCardGameAttributeSet, Recovery)
+	
+	UFUNCTION()
+	void OnRep_Recovery(const FGameplayAttributeData& oldRecovery) const;
+	
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Scheme, Category = "Villian Attributes")
+	FGameplayAttributeData Scheme;
+	ATTRIBUTE_ACCESSORS(UCardGameAttributeSet, Scheme)
+	
+	UFUNCTION()
+	void OnRep_Scheme(const FGameplayAttributeData& oldScheme) const;
 
 private:
 	void SetEffectProperties(const struct FGameplayEffectModCallbackData& Data, FEffectProperties& Props);

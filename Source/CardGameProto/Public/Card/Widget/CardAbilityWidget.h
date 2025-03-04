@@ -3,8 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CardGameWidget.h"
 #include "Blueprint/UserWidget.h"
-#include "CardPowerWidget.generated.h"
+#include "CardAbilityWidget.generated.h"
 
 class UBorder;
 class UTextBlock;
@@ -12,7 +13,7 @@ class UTextBlock;
  * 
  */
 UCLASS()
-class CARDGAMEPROTO_API UCardPowerWidget : public UUserWidget
+class CARDGAMEPROTO_API UCardAbilityWidget : public UCardGameWidget
 {
 	GENERATED_BODY()
 
